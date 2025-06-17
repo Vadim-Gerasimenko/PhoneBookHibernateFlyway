@@ -2,7 +2,7 @@ import axios from "axios";
 
 export default class PhoneBookService {
     constructor() {
-        this.baseUrl = "/api/contacts";
+        this.baseUrl = "/api/contact";
     }
 
     get(url, params) {
