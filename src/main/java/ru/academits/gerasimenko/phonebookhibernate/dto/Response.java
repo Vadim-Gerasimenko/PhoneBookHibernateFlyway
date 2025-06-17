@@ -1,9 +1,9 @@
-package ru.academits.gerasimenko.phonebookhibernate.entity;
+package ru.academits.gerasimenko.phonebookhibernate.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 @AllArgsConstructor
 public class Response {
     private boolean success;
