@@ -1,23 +1,28 @@
 package ru.academits.gerasimenko.phonebookhibernate.utilities;
 
-import ru.academits.gerasimenko.phonebookhibernate.dto.Contact;
+import ru.academits.gerasimenko.phonebookhibernate.dao.ContactRepository;
+import ru.academits.gerasimenko.phonebookhibernate.entity.Contact;
 import ru.academits.gerasimenko.phonebookhibernate.exception.ContactNotFoundException;
 import ru.academits.gerasimenko.phonebookhibernate.exception.ContactProcessingException;
 import ru.academits.gerasimenko.phonebookhibernate.exception.ExistingContactNumberException;
 import ru.academits.gerasimenko.phonebookhibernate.exception.IncorrectContactDataException;
-import ru.academits.gerasimenko.phonebookhibernate.repository.PhoneBookRepository;
+
+import java.util.Objects;
+import java.util.Optional;
 
 public class ContactProcessor {
     private ContactProcessor() {
     }
 
     public static Contact processContact(Contact contact) {
-        return new Contact(
-                contact.getId(),
-                TextUtilities.getEscapedHtmlText(contact.getName()),
-                TextUtilities.getEscapedHtmlText(contact.getSurname()),
-                TextUtilities.getEscapedHtmlText(contact.getPhone())
-        );
+        Contact processedContact = new Contact();
+
+        processedContact.setId(contact.getId());
+        processedContact.setName(TextUtilities.getEscapedHtmlText(contact.getName()));
+        processedContact.setSurname(TextUtilities.getEscapedHtmlText(contact.getSurname()));
+        processedContact.setPhone(TextUtilities.getEscapedHtmlText(contact.getPhone()));
+
+        return processedContact;
     }
 
     public static void checkContactForCorrectness(Contact contact) {
@@ -38,26 +43,27 @@ public class ContactProcessor {
         }
     }
 
-    public static void checkContactForNotExisting(PhoneBookRepository phoneBook, Contact contact) {
-        if (phoneBook.getContacts("").stream()
-                .anyMatch(c -> c.getPhone().equals(contact.getPhone()))
-        ) {
+    public static void checkContactForNotExisting(ContactRepository contactRepository, Contact contact) {
+        if (contactRepository.getByPhone(contact.getPhone()) != null) {
             throw new ExistingContactNumberException("Phone number '" + contact.getPhone() + "' already exists");
         }
     }
 
-    public static void checkContactForNotExistingOrSame(PhoneBookRepository phoneBook, Contact contact) {
-        if (phoneBook.getContacts("").stream()
-                .anyMatch(c -> c.getId() != contact.getId() && c.getPhone().equals(contact.getPhone()))
-        ) {
+    public static void checkContactForNotExistingOrSame(ContactRepository contactRepository, Contact contact) {
+        Contact existingContact = contactRepository.getByPhone(contact.getPhone());
+
+        if (existingContact != null && !Objects.equals(existingContact.getId(), contact.getId())) {
             throw new ExistingContactNumberException("Phone number '" + contact.getPhone() + "' already exists");
         }
     }
 
-    public static void checkForExistingContactById(PhoneBookRepository phoneBook, int id) {
-        if (phoneBook.getContacts("").stream().noneMatch(c -> c.getId() == id)
-        ) {
+    public static Contact checkContactForExistingById(ContactRepository contactRepository, int id) {
+        Optional<Contact> optionalContact = contactRepository.findById(id);
+
+        if (optionalContact.isEmpty()) {
             throw new ContactNotFoundException("Contact with id = " + id + " not found");
         }
+
+        return optionalContact.get();
     }
 }
