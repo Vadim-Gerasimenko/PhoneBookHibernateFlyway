@@ -1,0 +1,2 @@
+ALTER TABLE contact
+ALTER COLUMN surname TYPE VARCHAR(30);
