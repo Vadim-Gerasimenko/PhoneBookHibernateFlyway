@@ -9,13 +9,13 @@ import lombok.Setter;
 @Setter
 public class Contact {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(nullable = false, length = 20)
     private String name;
 
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, length = 30)
     private String surname;
 
     @Column(nullable = false, length = 20, unique = true)
