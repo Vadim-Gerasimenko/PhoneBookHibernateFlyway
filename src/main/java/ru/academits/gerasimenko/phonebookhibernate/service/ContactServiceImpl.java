@@ -21,8 +21,8 @@ public class ContactServiceImpl implements ContactService {
     public List<Contact> getContacts(String term) {
         String processedTerm = term;
 
-        if (processedTerm == null) {
-            processedTerm = "";
+        if (processedTerm == null || processedTerm.isEmpty()) {
+            return contactRepository.findAll();
         }
 
         processedTerm = processedTerm.trim().toLowerCase();
